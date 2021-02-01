@@ -1,5 +1,12 @@
 #!/bin/bash
 #Extract all occurences of function calls and the assigned variables from kernel sources
+funcs=("kmalloc" "kfree")
+
+rm -f cscope.out cscope.files 
+
+for f in ${funcs[@]}; do
+    rm -f $f
+done
 
 if [ $# -eq 0 ]; then
     echo "Usage: $0 <kernel src dir>"
@@ -12,7 +19,6 @@ if ! [ -x "$(command -v cscope)" ]; then
 fi
 
 echo "Generating file cscope.files.."
-echo "Executing find  $1, ignoring ->$1/drivers*"
 find  $1 \
 	-path "$1arch/alpha*" -prune -o \
 	-path "$1arch/arc*" -prune -o \
@@ -41,7 +47,11 @@ find  $1 \
     -path "$1Documentation*" -prune -o \
     -path "$1scripts*" -prune -o \
     -path "$1tools*" -prune -o \
-    -path "$1*" -prune -o \
     -name "*.[chxsS]" -print > ./cscope.files
+echo "Done!"
 
+echo "Generating occurence database.."
+for f in ${funcs[@]}; do
+    cscope -L -0 $f > "$f.out"
+done
 echo "Done!"
