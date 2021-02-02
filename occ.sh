@@ -1,8 +1,9 @@
 #!/bin/bash
 #Extract all occurences of function calls and the assigned variables from kernel sources
-funcs=("kmalloc" "kfree")
+funcs=("kmalloc" "kzalloc" "kfree")
+out=".funcs"
 
-rm -f cscope.out cscope.files 
+rm -f cscope.out cscope.files $out
 
 for f in ${funcs[@]}; do
     rm -f $f
@@ -51,7 +52,8 @@ find  $1 \
 echo "Done!"
 
 echo "Generating occurence database.."
+echo "$1" >> $out
 for f in ${funcs[@]}; do
-    cscope -L -0 $f > "$f.out"
+    cscope -L -0 $f >> $out
 done
 echo "Done!"
